@@ -1,0 +1,103 @@
+---
+title       : Response performance of help desks
+subtitle    : 
+author      : Dinesh 
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : solarized_light      # 
+widgets     : [bootstrap, shiny, interactive]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+
+ext_widgets : {rCharts: [libraries/nvd3]}
+---
+
+## Response performance of help desks and call centers
+
+
+Help desk and call centers that respond to and resolve service requests have a need to know and report on their performance.
+
+--- .class #id 
+
+## Response performance app
+
+The Response performance Shiny app reports a help desk's performance on the requests it receives measured against a set service level agreement (SLA). 
+
+Given the number of days to respond to a request (SLA), it provides the count of requests that are within the SLA days (in green) and the ones outside (in red) in a simple bar plot.
+
+--- .class #id 
+
+## The response performance app in action
+
+The app output for a response SLA of 2 days is shown below. An interactive version is available at the following link at shinyapps.io <a href=https://dineshkb.shinyapps.io/slaCalc/>response performance</a>
+
+
+```{r results = 'asis', comment = NA, message = F, echo = F}
+requests <- data.frame(
+              raised_date=as.Date(c("12/10/2015",
+                                    "12/10/2015",
+                                    "13/10/2015",
+                                    "13/10/2015",
+                                    "13/10/2015",
+                                    "13/10/2015",
+                                    "14/10/2015",
+                                    "15/10/2015",
+                                    "15/10/2015",
+                                    "16/10/2015",
+                                    "16/10/2015",
+                                    "19/10/2015",
+                                    "20/10/2015",
+                                    "20/10/2015",
+                                    "20/10/2015"), 
+                                  "%d/%m/%Y"),
+              response_date=as.Date(c("14/10/2015",
+                                      "12/10/2015",
+                                      "13/10/2015",
+                                      "13/10/2015",
+                                      "13/10/2015",
+                                      "13/10/2015",
+                                      "14/10/2015",
+                                      "15/10/2015",
+                                      "15/10/2015",
+                                      "19/10/2015",
+                                      "16/10/2015",
+                                      "19/10/2015",
+                                      "20/10/2015",
+                                      "20/10/2015",
+                                      "20/10/2015"), 
+                                    "%d/%m/%Y"))
+requests$age <- requests$response_date - requests$raised_date
+
+    # generate reponse SLA performance graph on input$responseSLA from ui.R
+    requests$slaMet <- "Within SLA"
+    requests$slaMet[requests$age > 2] <- "Outside SLA"
+    
+    slaMet <- requests$slaMet
+    
+    #add default rows to force the table function to count atleast 
+    #one of these groups (need this for the barplot function to display
+    #'0' if either are '0')
+    slaMet <- c(slaMet, "Within SLA", "Outside SLA") 
+    
+    # draw a barchart with the specified number of bins
+    sla <- table(slaMet)
+    
+    #remove the defaults that were added from the count
+    sla <- sla - 1
+    
+    b <- barplot(sla, col = c('red', 'green'), border = 'white', xlab="Response performance")
+
+    text(b, 0, sla, cex=1, pos=3)
+
+b$show('inline')
+```
+
+--- .class #id 
+
+## In conclusion
+
+
+The Response performance app provides an easy way to report performance of a help desk against a given reponse SLA.
+
+
+--- .class #id 
